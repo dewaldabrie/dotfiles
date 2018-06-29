@@ -1,12 +1,6 @@
 " ========== Vim Basic Settings ============="
 
 
-" Pathogen settings.
-filetype off
-call pathogen#runtime_append_all_bundles()
-execute pathogen#infect()
-filetype plugin indent on
-syntax on
 
 
 " ========================================================================================
@@ -140,7 +134,7 @@ let g:project_root = "."
 let g:search_root = g:project_root
 let g:search_pattern = "*.*"
 "==========================================================================="
-" Get Rid of stupid Goddamned help keys
+" Get Rid of stupid help keys
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
@@ -217,26 +211,13 @@ if has("gui_running")
     set guioptions-=L
     set guioptions+=a
     set guioptions-=m
-    colo badwolf
     set listchars=tab:▸\ ,eol:¬         " Invisibles using the Textmate style
 else
     set t_Co=256
-    colorschem badwolf
 endif
 
 " ========== END Gvim Settings ==========
 
-
-" ========== Plugin Settings =========="
-
-
-" ENABLE CTRL INTERPRETING FOR VIM
-silent !stty -ixon > /dev/null 2>/dev/null
-
-"==========================================================================="
-" Mapping to NERDTree
-noremap <leader>m :NERDTreeToggle<cr>
-let NERDTreeIgnore=['\.vim$', '\~$', '\.pyc$']
 
 " ================ ReplaceText function ============================
 
@@ -370,22 +351,6 @@ imap <F9> <ESC> set makeprg=make\ -C\ ./build<cr> :make --no-print-directory <cr
 
 
 "==========================================================================="
-"Tagbar key bindings
-nmap <leader>l <ESC>:TagbarToggle<cr>
-
-"==========================================================================="
-" Mini Buffer some settigns."
-let g:miniBufExplMapWindowNavVim = 1
-let g:miniBufExplMapWindowNavArrows = 1
-let g:miniBufExplMapCTabSwitchBufs = 1
-let g:miniBufExplModSelTarget = 1
-
-"==========================================================================="
-" Force Saving Files that Require Root Permission
-"
-command! Sudowrite w !sudo tee % > /dev/null
-
-"==========================================================================="
 " TAB and Shift-TAB in normal mode cycle buffers
 "
 nmap <Tab> :bn<CR>
@@ -395,10 +360,6 @@ nmap <S-Tab> :bp<CR>
 "==========================================================================="
 " highlight current line
 set cursorline
-
-"==========================================================================="
-" Configure autocomplete tool
-let g:acp_EnableAtStartup = 1
 
 "==========================================================================="
 set laststatus=2
@@ -412,61 +373,6 @@ set expandtab
 nmap <silent> <leader>ov :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :w<CR> :so $MYVIMRC<CR>
 
-"==========================================================================="
-" Manpage for word under cursor via 'K' in command moderuntime
-runtime ftplugin/man.vim
-noremap <buffer> <silent> K :exe "Man" expand('<cword>') <CR>
-
-"==========================================================================="
-" Map SyntasticCheck to F4 
-"
-"noremap <silent> <F4> :SyntasticCheck<CR>
-"noremap! <silent> <F4> <ESC>:SyntasticCheck<CR>
-
-"==========================================================================="
-au BufNewFile,BufRead *.c,*.cc,*.cpp,*.h call SetupCandCPPenviron()
-function! SetupCandCPPenviron()
-    "
-    " Search path for 'gf' command (e.g. open #include-d files)
-    "
-    set path+=/usr/include/c++/**
-
-    "
-    " Especially for C and C++, use section 3 of the manpages
-    "
-    noremap <buffer> <silent> K :exe "Man" 3 expand('<cword>') <CR>
-endfunction
-
-
-"==========================================================================="
-" CCTree configuration
-let g:CCTreeRecursiveDepth = 1
-let g:CCTreeMinVisibleDepth = 1
-let g:CCTreeOrientation = "rightbelow"
-
-function! LoadCCTree()
-    let databaseDir = $HOME."/.vim/cscope_databases"
-    if IsFileAlreadyExists ( databaseDir."/last_project_cscope")
-        execute "silent :CCTreeLoadDB ".databaseDir."/last_project_cscope"
-    endif
-    let userDef = substitute(system("echo $USER"), "\n", '', '')
-    if userDef == "docker" && IsFileAlreadyExists( databaseDir."/dtv_project_cscope")
-        execute "silent :CCTreeAppendDB ".databaseDir."/dtv_project"
-    endif
-endfunction
-
-
-" CCTree shortucts"
-nmap <leader>ct :silent call LoadCCTree()<cr>
-noremap <buffer> <silent> <leader>cr :execute "CCTreeTraceReverse ".expand('<cword>')<cr>
-noremap <buffer> <silent> <leader>cf :execute "CCTreeTraceForward ".expand('<cword>')<cr>
-
-let g:CCTreeKeyHilightTree = '<C-l>'        " Static highlighting
-let g:CCTreeKeySaveWindow = '<C-\>y' 
-let g:CCTreeKeyToggleWindow = '<C-\>w' 
-let g:CCTreeKeyCompressTree = 'zs'     " Compress call-tree 
-let g:CCTreeKeyDepthPlus = '<C-\>=' 
-let g:CCTreeKeyDepthMinus = '<C-\>-'
 
 "==========================================================================="
 function! LoadCScopeDatabases()
@@ -583,97 +489,28 @@ endfunction
 command! -nargs=1 NewCppClass call CreateCppClassFiles("<args>")
 
 "==========================================================================="
-" setting ctags 
-set tags+=~/.vim/tags/last_project_tags
-set tags+=~/.vim/tags/dtv_project_tags
-set tags+=~/.vim/tags/gstreamer_tags
-set tags+=~/.vim/tags/mythtv_tags
-set tags+=~/.vim/tags/cpp_tags
-set tags+=~/.vim/tags/usr_local_include_tags
-
-"==========================================================================="
 nmap <leader>ud :silent call UpdateCscopeDatabase(".")<cr>:w<cr>
 imap <leader>ud <ESC>l:silent call UpdateCscopeDatabase(".")<cr>:w<cr>i
 
 nmap <leader>uad :call UpdateAllCscopeDatabases()<cr>:w<cr>
 imap <leader>uad <ESC>l:call UpdateAllCscopeDatabases()<cr>:w<cr>i
 
-"==========================================================================="
-set autochdir
-let NERDTreeChDirMode=2
-
-" =========== END Plugin Settings =========="
-"
-"
-
-"==========================================================================="
-" Save and load session
-"
-map <leader>ss :SessionSaveAs user_auto_saved_session<cr>:NERDTree .<cr>
-map <leader>so :SessionOpen user_auto_saved_session<cr><C-d><C-d>,n:NERDTree .<cr>
-
-"==========================================================================="
-""Open default session (session saved during closing vim)
-map <leader>sd :SessionOpen vim_auto_saved_session<cr>:NERDTree .<cr> 
 
 " =========== Startup commands =========="
 
-autocmd VimEnter * SignatureToggleSigns
-if &diff 
-    autocmd VimEnter * NERDTree .
-else 
-    "autocmd VimEnter * NERDTree .
-    "autocmd VimEnter * TagbarOpen
-    autocmd VimEnter * helptags ~/.vim/doc
-    "autocmd VimEnter * exe 2 . "wincmd w"
-    autocmd VimEnter * call CheckIfMain()
-    autocmd VimEnter * call LoadCScopeDatabases()
-    autocmd VimEnter * call DetectFileType()
+"autocmd VimEnter * exe 2 . "wincmd w"
+autocmd VimEnter * call CheckIfMain()
+autocmd VimEnter * call LoadCScopeDatabases()
+autocmd VimEnter * call DetectFileType()
 
-    autocmd BufWritePost ~/.vimrc source ~/.vimrc
-    "au BufNewFile,BufRead * :set relativenumber " relative line numbers
+autocmd BufWritePost ~/.vimrc source ~/.vimrc
+"au BufNewFile,BufRead * :set relativenumber " relative line numbers
 
-endif
 
 " =========== Leaving commands =========="
 
 autocmd VimLeave * SessionSaveAs vim_auto_saved_session
 
-
-"============ Configuration Omni Completion =============================="
-
-filetype plugin on
-autocmd FileType python set omnifunc=pythoncomplete#Complete
-autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
-autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-autocmd FileType cpp set omnifunc=omni#cpp#complete#Main
-
-if v:version >= 600
-    filetype plugin on
-    filetype indent on
-else
-    filetype on
-endif
-
-if v:version >= 700
-    set omnifunc=syntaxcomplete#Complete " override built-in C omnicomplete with C++ OmniCppComplete plugin
-    "let g:SuperTabDefaultCompletionType = "<C-@>" 
-    let OmniCpp_NamespaceSearch     = 1
-    let OmniCpp_GlobalScopeSearch   = 1
-    let OmniCpp_DisplayMode         = 1
-    let OmniCpp_ShowScopeInAbbr     = 0 "do not show namespace in pop-up
-    let OmniCpp_ShowPrototypeInAbbr = 1 "show prototype in pop-up
-    let OmniCpp_ShowAccess          = 1 "show access in pop-up
-    let OmniCpp_SelectFirstItem     = 2 "select first item in pop-up
-    let OmniCpp_MayCompleteDot      = 1
-    let OmniCpp_MayCompleteArrow    = 1
-    let OmniCpp_MayCompleteScope    = 1
-    let OmniCpp_DefaultNamespaces   = ['std','_GLIBCXX_STD']
-
-    set completeopt=menuone,menu,longest,preview
-endif
 
 "===================================================================================================
 " Commenting blocks of code.
@@ -726,19 +563,6 @@ map <Leader>hon :%!xxd<CR>
 map <Leader>hof :%!xxd -r<CR>
 
 " ========================================================================================
-" " USING TASKLIST
-" TODO
-map <leader>td <Plug>TaskList
-
-" ========================================================================================
-" " USING GUNDO (revision of history saving)
-
-map <leader>gu :GundoToggle<CR>
-let g:gundo_width = 60
-let g:gundo_preview_height = 40
-let g:gundo_right = 1
-
-" ========================================================================================
 " " Resize split window horizontally and vertically
 " Shortcuts to Shift-Alt-Up - Alt is mapped as M in vim
 nmap <S-M-Up> :2winc+<cr>
@@ -750,41 +574,6 @@ nmap <S-M-Left> :2winc><cr>
 imap <S-M-Left> <Esc>:2winc><cr>i
 nmap <S-M-Right> :2winc<<cr>
 imap <S-M-Right> <Esc>:2winc<<cr>i
-
-" ========================================================================================
-" " ProtoDef plugin 
-" ========================================================================================
-" Allows pulling C++ function prototypes into implementation files 
-" https://github.com/derekwyatt/vim-protodef 
-"
-let g:protodefprotogetter="$HOME/.vim/bundle/vim-protodef/pullproto.pl" 
-
-
-" ========================================================================================
-" " localvimrc plugin 
-" This plugin searches for local vimrc files in the file system tree of the
-" currently opened file.
-" https://github.com/embear/vim-localvimrc
-" ========================================================================================
-" 
-let g:localvimrc_persistent=2 
-
-
-" ========================================================================================
-" " gototagwithlinenumber 
-" This plugin allows going to file and line_number stored in tag (using ctags)
-" It is useful ex. when we are working with project and have logs for project. 
-" Then we can easly switch between logs and real source code using tags + functions
-" ========================================================================================
-" 
-nmap <leader>gt :GotoFileWithLineNumTag <cr>
-
-" ========================================================================================
-" shortcuts for switch plugin
-" ========================================================================================
-" 
-nmap <leader>- :Switch <cr>
-nmap <leader>= :call switch#Switch(g:variable_style_switch_definitions) <cr>
 
 
 " ========================================================================================
@@ -807,46 +596,6 @@ nnoremap <silent> p p`]
 " " Quickly select text which I just pasted  
 noremap gV `[v`]
 
-" ========================================================================================
-" VIM-expand-region  plugin 
-" https://github.com/terryma/vim-expand-region   
-" 
-vmap v <Plug>(expand_region_expand)
-vmap r <Plug>(expand_region_shrink) 
-
-" ========================================================================================
-" VIM-airline  plugin 
-" https://github.com/bling/vim-airline   
-let g:airline#extensions#tabline#enabled = 1 
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|' 
-
-function! AirlineInit()
-  let g:airline_section_a = airline#section#create(['mode'])
-  let g:airline_section_c = airline#section#create(['%F'])
-endfunction
-autocmd VimEnter * call AirlineInit() 
-
-  let g:airline_theme_patch_func = 'AirlineThemePatch'
-  function! AirlineThemePatch(palette)
-    if g:airline_theme == 'badwolf'
-      for colors in values(a:palette.inactive)
-        let colors[3] = 245
-      endfor
-    endif
-  endfunction
-
-" ========================================================================================
-" VIM-easy-align  plugin 
-"
-vmap <Enter> <Plug>(EasyAlign)
-" Start interacptive EasyAlign for a motion/text object (e.g. <Leader>aip)
-"nmap <Leader>b <Plug>(EasyAlign)
-
-" ========================================================================================
-" VIM-signature plugin 
-" https://github.com/kshenoy/vim-signature 
-nnoremap <leader>sm :SignatureToggleSigns<cr>
 
 " ========================================================================================
 " map ctrl+j to ctrl+m (for INSERT mode)in order to be more consistent with bash terminal 
@@ -866,38 +615,6 @@ noremap _ ,
 noremap - ;
 
 " ========================================================================================
-" enable matchit plugin which extends usage of % operator to match 
-" more words ex. if/end def/end html tags etc.
-runtime macros/matchit.vim
-
-" ========================================================================================
-" set F2 as shortcut for toggle INSERT (paste) mode    
-nnoremap <F2> :set invpaste paste?<CR>
-
-" ========================================================================================
-" map last substitute execution to normal mode & operator
-nnoremap & :&&<CR>
-xnoremap & :&&<CR>
-
-" ========================================================================================
-" quick-scope plugin settings
-" Trigger a highlight in the appropriate direction when pressing these keys:
-let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
-
-" Trigger a highlight only when pressing f and F.
-let g:qs_highlight_on_keys = ['f', 'F']
-
-let g:qs_first_occurrence_highlight_color = 155       " terminal vim
-
-let g:qs_second_occurrence_highlight_color = 81         " terminal vim
-
-" =======================================================================================
-" yankring
-" 2nd and 3rd <cr> is needed only if you use DidYouMean plugin ()
-noremap <leader>yr :YRShow <cr><cr><cr>
-let g:yankring_replace_n_pkey = '<leader>yp'
-
-" ========================================================================================
 " vimdiff options
 " Always use vertical diffs 
 set diffopt+=vertical
@@ -912,16 +629,6 @@ if executable('ag')
 endif
 
 nmap  <leader>ag :exe "Ack " expand('<cword>') <CR>
-
-" ========================================================================================
-" CtrlSF shortcuts
-nmap     <C-F>f :exe "CtrlSF" expand('<cword>') <CR>
-vmap     <C-F>F <Plug>CtrlSFVwordExec <CR>
-nmap     <C-F>n <Plug>CtrlSFCwordPath <CR>
-nmap     <C-F>p <Plug>CtrlSFPwordPath <CR>
-nnoremap <C-F>o :CtrlSFOpen<CR>
-nnoremap <C-F>t :CtrlSFToggle<CR>
-inoremap <C-F>t <Esc>:CtrlSFToggle<CR>
 
 " ========================================================================================
 " remap movement for wrapped lines being the same as for non-wrapped lines
@@ -960,67 +667,7 @@ vnoremap p <Esc>:let current_reg = @"<CR>gvs<C-R>=current_reg<CR><Esc>
 " ========================================================================================
 " search but say in the current search occurance
 nmap * *N
-" " ========================================================================================
-" " Easy motion configuration 
-" "
-" " <Leader>f{char} to move to {char}
-" map  <Leader><Leader>f <Plug>(easymotion-bd-f)
-" nmap <Leader><Leader>f <Plug>(easymotion-overwin-f)
-" 
-" " s{char}{char} to move to {char}{char}
-nmap s <Plug>(easymotion-overwin-f2)
-" 
-" " Move to line
-" map <Leader><Leader>l <Plug>(easymotion-bd-jk)
-" nmap <Leader><Leader>l <Plug>(easymotion-overwin-line)
-" 
-" " Move to word
-" " map  <Leader><Leader>w <Plug>(easymotion-bd-w)
-" " nmap <Leader><Leader>w <Plug>(easymotion-overwin-w)
-"
-map  <leader>/ <Plug>(easymotion-sn)
-omap <leader>/ <Plug>(easymotion-tn)
-" " ========================================================================================
-" vimwiki configuration
-let g:vimwiki_list = [{'path': '/var/www/html/vimsite', 'path_html': '/var/www/html/vimhtml'}]
-"<leader>ww - iopen wiki in current tab
-"<leader>wt - iopen wiki in new tab
 
-" " ========================================================================================
-" vimwiki configuration
-"<leader>rr - browse using ranger in current tab
-"<leader>rt - browser using ranger in new tab
-"<leader>rv - browser using ranger in tab splitted vertically
-"<leader>rs - browser using ranger in tab splitted horizontally
-
-" " ========================================================================================
-" run command conriguration
-let g:vim_run_command_map = {
-  \'javascript': 'node',
-  \'php': 'php',
-  \'python': 'python',
-  \'bash': 'bash',
-  \}
-":Run yourcommand - runs selected command 
-" '<,'>RunVisual - run commands from selected lines 
-""AutoRun - autorun commands from file on each save
-" " ========================================================================================
-" ctrlp configuration
-let g:ctrlp_map = '<C-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
-" " ========================================================================================
-" ctrlp configuration
-nmap <leader><leader>l :CtrlPLocate<cr>
-" " ========================================================================================
-" visualmarks configuration
-" vmap <unique> m <Plug>VisualMarksVisualMark
-nmap <leader>< <Plug>VisualMarksGetVisualMark
-
-
-" " ========================================================================================
-" set mutt-based variables 
-"setlocal fo+=aw
 
 " " ========================================================================================
 " Make 0 go to the first character rather than the beginning
@@ -1115,16 +762,6 @@ endfunction
 
 nmap <leader>j :call GotoJump()<cr>
 
-" ======================================================================================== 
-" add fzf plugin to runtimepath
-""
-set rtp+=~/.fzf
-
-nmap <C-]> g<C-]>
-
-" ======================================================================================== 
-" rainbow levels toggle
-nmap <leader>rlt :RainbowLevelsToggle<cr>
 
 " ======================================================================================== 
 " Set the cursor to to a '|' when in insert mode
